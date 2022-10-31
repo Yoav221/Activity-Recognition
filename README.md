@@ -5,6 +5,8 @@ In this specific project I train the model to recognize between explosion and no
 You can use the code also to your needs - you just need to change to change the settings in the 'const' module.
 
 Just set the pathes like this:
+
+
 Data -> Video_data -> class_1 -> 'class_1_1.avi'
                                  'class_1_2.avi'
         
