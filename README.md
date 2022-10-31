@@ -4,7 +4,9 @@ Just make sure to change the settings and parameters in the 'const.py' module.
 
 We use CNN + RNN archcitecture to extract features from the video's frames, and feed those features into the RNN.
 
-INSTRUCTIONS:
+
+Instructions:
+
 Set the pathes this way:
 
         Data -> Video_data -> class_1 -> 'class_1_1.avi'
