@@ -1,5 +1,5 @@
 # Activity-Recognition
-The goal in this project is to identify specific activity in a video, and count how many times it accurs, and also extract the location of each activity the model recognized. My problem was to find explosions in a given video, but you can use this code to every problem you choose.
+The goal in this project is to identify specific activity in a video, count how many times it accurs, and extract the location of each activity the model recognized. My problem was to find explosions in a given video, but you can use this code to every problem you choose.
 Just make sure to change the settings and parameters in the 'const.py' module.
 
 We use CNN + RNN archcitecture to extract features from the video's frames, and feed those features into the RNN.
