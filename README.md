@@ -2,7 +2,7 @@
 The goal in this project is to identify specific activity in a video, and count how many times it accurs, and also extract the location of each activity the model recognized. My problem was to find explosions in a given video, but you can use this code to every problem you choose.
 Just make sure to change the settings and parameters in the 'const.py' module.
 
-Just set the pathes like this:
+Just set the pathes this way:
 
         Data -> Video_data -> class_1 -> 'class_1_1.avi'
                                          'class_1_2.avi'
