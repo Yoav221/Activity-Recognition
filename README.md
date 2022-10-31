@@ -7,8 +7,8 @@ Just set the pathes this way:
         Data -> Video_data -> class_1 -> 'class_1_1.avi'
                                          'class_1_2.avi'
         
-                              class_2 - > 'class_1_1.avi'
-                                          'class_1_2.avi'
+                              class_2 - > 'class_2_1.avi'
+                                          'class_2_2.avi'
         
                 Train_data -> 'The code will create this data'                       
                 Sample_data -> 'The code will create this data'                       
