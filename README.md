@@ -1,19 +1,17 @@
 # Activity-Recognition
 The goal in this project is to identify specific activity in a video, and count how many times it accurs, and also extract the location of each activity the model recognized. My problem was to find explosions in a given video, but you can use this code to every problem you choose.
-
-In this specific project I train the model to recognize between explosion and non-explosion.
-You can use the code also to your needs - you just need to change to change the settings in the 'const' module.
+Just make sure to change the settings and parameters in the 'const.py' module.
 
 Just set the pathes like this:
 
- Data -> Video_data -> class_1 -> 'class_1_1.avi'
-                                  'class_1_2.avi'
+        Data -> Video_data -> class_1 -> 'class_1_1.avi'
+                                         'class_1_2.avi'
         
-                      class_2 - > 'class_1_1.avi'
-                                  'class_1_2.avi'
+                              class_2 - > 'class_1_1.avi'
+                                          'class_1_2.avi'
         
-        Train_data -> 'The code will create this data'                       
-        Sample_data -> 'The code will create this data'                       
+                Train_data -> 'The code will create this data'                       
+                Sample_data -> 'The code will create this data'                       
                       
                                  
 
