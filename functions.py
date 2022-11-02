@@ -9,9 +9,7 @@ import cv2
 from const import *
 from torch.utils import data
 
-# ------------- Some Useful Functions ----------------
-
-
+# ------------- Prepare the data ----------------
 def labels2cat(label_encoder, list):
     return label_encoder.transform(list)
 
@@ -69,7 +67,6 @@ def data_loading_params(batch_size):
     return use_cuda, device, params
 
 
-# ------------------ Functions to Prepare the Data -----------------
 def get_video_array(video_path):
     cap = cv2.VideoCapture(video_path)
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -158,7 +155,7 @@ def save_frames_from_multiple_videos(video_name, video_path, frame_path):
             video_file, (f'{frame_path}/{video_name}{i}'))
 
 
-# --------------- Train & Validation functions --------------------
+# --------------- Train & Validation --------------------
 def train(log_interval, model, device, train_loader, optimizer, epoch):
     # Set model as training mode
     cnn_encoder, rnn_decoder = model

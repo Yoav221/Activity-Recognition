@@ -31,12 +31,12 @@ class Trainer:
         crnn_params = list(self.cnn_encoder.parameters()) + list(self.rnn_decoder.parameters())
         self.optimizer = torch.optim.Adam(crnn_params, lr=self.LEARNING_RATE)
 
+
     def prepare_data(self):
 
-        # convert labels -> category
+        # convert labels -> 1-hot
         le = sklearn.preprocessing.LabelEncoder()
         le.fit(CLASSES)
-        # convert category -> 1-hot
         action_category = le.transform(CLASSES).reshape(-1, 1)
         enc = sklearn.preprocessing.OneHotEncoder()
         enc.fit(action_category)

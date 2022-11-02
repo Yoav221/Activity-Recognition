@@ -78,25 +78,26 @@ class Predict:
 
         self.cnn_encoder.load_state_dict(torch.load(
             os.path.join(save_model_path, 'cnn_encoder_epoch4.pth')))
+
         self.rnn_decoder.load_state_dict(torch.load(
             os.path.join(save_model_path, 'rnn_decoder_epoch4.pth')))
+
         print('CRNN model reloaded!')
 
         all_y_pred = self.CRNN_final_prediction(
             [self.cnn_encoder, self.rnn_decoder], self.device, self.data_loader)
 
-        # write in pandas dataframe
+        # Create a dataframe with all the data
         video_df = pd.DataFrame(data={'filename': self.fnames, 'y_pred': cat2labels(
             self.le, all_y_pred)})
-
         df = pd.concat([video_df, self.index_df], axis=1, join='inner')
 
         # Show results - how many explosions
-        print(df['y_pred'].value_counts())
-        df.to_csv("./Final_Prediction.csv")  # save pandas dataframe
+        print('Result: ' + str(df['y_pred'].value_counts()))
+        df.to_csv("./Final_Prediction.csv")
         print('video prediction finished!')
 
 
 if __name__ == '__main__':
-    p = Predict(SAMPLE_FRAME_PATH) # Predict on the sample frames
+    p = Predict(SAMPLE_FRAME_PATH)  # Predict on the sample frames
     p.predict()

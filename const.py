@@ -12,9 +12,10 @@ EXPLOSION_VIDEO_DATA = r'./Data/Video_data/class1'
 NON_EXPLOSION_VIDEO_DATA = r'./Data/Video_data/class2'
 
 # Samples Data - the samples that have been splited from the whole video, and we run our model on those samples
-SAMPLE_VIDEO_PATH = '...'
-SAMPLE_FRAME_PATH = '...'
-SAMPLE_INDEX_DF = '...'
+SAMPLE_VIDEO_PATH = r'Data/Sample_data/Sample_videos'
+SAMPLE_FRAME_PATH = r'Data/Sample_data/Sample_frames'
+
+SAMPLE_INDEX_DF = 'Sample_index_data.csv'
 # INPUT VIDEO
 INPUT_VID = r'...'
 
