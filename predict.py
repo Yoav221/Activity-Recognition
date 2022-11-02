@@ -13,9 +13,8 @@ from torch.utils import data
 from models import *
 
 '''In this code we create samples video from the video, 
-and the model will run on all of them and make a prediction,
-wether It's an explosion or not. 
-The result will be saved in ./Final_Prediction_bomb_classifier.pkl'''
+and the model will run on all of them and make a prediction, wether it's class 1 or 2.
+The result will be saved in ./Final_Prediction.csv'''
 
 
 class Predict:
@@ -77,10 +76,10 @@ class Predict:
     def predict(self):
 
         self.cnn_encoder.load_state_dict(torch.load(
-            os.path.join(save_model_path, 'cnn_encoder_epoch4.pth')))
+            os.path.join(save_model_path, f'cnn_encoder_epoch{EPOCHS}.pth')))
 
         self.rnn_decoder.load_state_dict(torch.load(
-            os.path.join(save_model_path, 'rnn_decoder_epoch4.pth')))
+            os.path.join(save_model_path, f'rnn_decoder_epoch{EPOCHS}.pth')))
 
         print('CRNN model reloaded!')
 
@@ -90,11 +89,13 @@ class Predict:
         # Create a dataframe with all the data
         video_df = pd.DataFrame(data={'filename': self.fnames, 'y_pred': cat2labels(
             self.le, all_y_pred)})
-        df = pd.concat([video_df, self.index_df], axis=1, join='inner')
+        all_data = pd.concat([video_df, self.index_df], axis=1, join='inner')
+        only_class1_data = all_data[all_data['y_perd'] == 'class1']
 
-        # Show results - how many explosions
-        print('Result: ' + str(df['y_pred'].value_counts()))
-        df.to_csv("./Final_Prediction.csv")
+        # Show results - how many class 1 activities
+        print('Result: ' + str(all_data['y_pred'].value_counts()))
+        all_data.to_csv("././Final_Prediction.csv")
+        only_class1_data.to_csv("./Final_Prediction_of_class1.csv")
         print('video prediction finished!')
 
 

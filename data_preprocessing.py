@@ -2,22 +2,19 @@ from functions import *
 
 def main():
     
-    for file in os.listdir(EXPLOSION_VIDEO_DATA):
-        if file[2] == 'm':
-            rename_data(EXPLOSION_VIDEO_DATA, first_num_file=1,
-                        new_name='single_exlposion')
-    for file in os.listdir(NON_EXPLOSION_VIDEO_DATA):
-        if file[2] == 'm':
-            rename_data(NON_EXPLOSION_VIDEO_DATA,
-                        first_num_file=1, new_name='non_exlposion')
+    for file in os.listdir(CLASS_1_VIDEO_DATA):
+        if file[:len(SAMPLE_NAME)] == SAMPLE_NAME:
+            rename_data(CLASS_1_VIDEO_DATA, first_num_file=1, new_name=CLASS_1_NAME)
+
+    for file in os.listdir(CLASS_2_VIDEO_DATA):
+        if file[:len(SAMPLE_NAME)] == SAMPLE_NAME:
+            rename_data(CLASS_2_VIDEO_DATA, first_num_file=1, new_name=CLASS_2_NAME)
 
 
     if not os.path.exists(TRAIN_DATA) or (os.stat(TRAIN_DATA).st_size == 0):
         os.mkdir(TRAIN_DATA)
-        SaveFrames.save_frames_from_multiple_videos(
-            EXPLOSION_VIDEO_DATA, TRAIN_DATA, 'single_explosion')
-        SaveFrames.save_frames_from_multiple_videos(
-            NON_EXPLOSION_VIDEO_DATA, TRAIN_DATA, 'non_explosion')
+        save_frames_from_multiple_videos(CLASS_1_VIDEO_DATA, TRAIN_DATA, CLASS_1_NAME)
+        save_frames_from_multiple_videos(CLASS_2_VIDEO_DATA, TRAIN_DATA, CLASS_2_NAME)
 
 if __name__ == '__main__':
     main()
