@@ -9,7 +9,7 @@ We use CNN + RNN archcitecture to extract features from the video's frames, and 
 Here we try to recognize an activity of size 10x10 that happens in a 10 frames window.
 You can change it to your need in the const.py module and adjust the Network's parameters.
 
-In order to recognize the activity in a given video, we need to run our model on the whole video. This means we need to split the whole video to small samples, and the model will make a prediction on each sample. This way we get the location of all the samples and count how many samples the model recognized as class1 (the activity we want to recognize). 
+In order to detect the activity in a given video, we need to split the whole video to small samples, and the model will make a prediction on each sample. This way we get the location of all the samples and count how many samples the model recognized as class1 (the wanted activity). 
 
 
 Instructions:
@@ -32,7 +32,7 @@ Set the pathes this way:
 - 
 - Choose an Input Video, and run 'create_samples.py' to create the samples from the video.
 - Run 'predict' to predict each sample.
-- Run plot_prediction.py to see the map for all the activities (class1) our model found in the video.
+- Run plot_prediction.py to see 3D map for all the activities (class1) our model found in the video.
 - Run draw_rectangle.py to draw a rectangle around every activity in the video.
                                 
                                 
