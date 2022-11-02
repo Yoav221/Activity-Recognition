@@ -5,7 +5,7 @@ class1 = activity
 
 class2 = non_activity
 
-We use CNN + RNN archcitecture to extract features from the video's frames, and feed those features into the RNN.
+We use CNN + RNN archcitecture, the CNN extract features from the video's frames, and we feed those features into the RNN.
 Here we try to recognize an activity of size 10x10 that happens in a 10 frames window.
 You can change it to your need in the const.py module and adjust the Network's parameters.
 
