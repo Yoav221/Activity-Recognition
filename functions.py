@@ -137,8 +137,8 @@ def save_frames_from_video_to_storage(video_path, frames_path):
             i += 1
             img_number = str(i).zfill(5)
             frame_file_name = f'{frames_path}//image{img_number}.png'
-            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            cv2.imwrite(frame_file_name, gray_frame)
+            # gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # This is optinal if you don't need color, it saves computation cost.
+            cv2.imwrite(frame_file_name, frame_file_name)
         else:
             break
 
