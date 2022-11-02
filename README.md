@@ -2,6 +2,7 @@
 The goal in this project is to identify specific activity in a video, count how many times it accurs, and extract the location of each activity the model recognized.
 
 class1 = activity
+
 class2 = non_activity
 
 We use CNN + RNN archcitecture to extract features from the video's frames, and feed those features into the RNN.
