@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
-df = pd.read_pickle('./Final_Prediction.pkl')
+df = pd.read_pickle('./Final_Prediction.csv')
 
 explosions = df[df['y_perd'] == 'single_exposion']
 print("We got {} explosions.".format(len(explosions)))
