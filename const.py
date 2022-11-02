@@ -8,8 +8,8 @@ save_model_path = r'CRNN_ckpt'
 TRAIN_DATA = r'./Data/Train_data'
 
 # Video data - you can change to your classes
-EXPLOSION_VIDEO_DATA = r'./Data/Video_data/class1'
-NON_EXPLOSION_VIDEO_DATA = r'./Data/Video_data/class2'
+CLASS_1_VIDEO_DATA = r'./Data/Video_data/class1'
+CLASS_2_VIDEO_DATA = r'./Data/Video_data/class2'
 
 # Samples Data - the samples that have been splited from the whole video, and we run our model on those samples
 SAMPLE_VIDEO_PATH = r'Data/Sample_data/Sample_videos'
@@ -19,10 +19,10 @@ SAMPLE_INDEX_DF = 'Sample_index_data.csv'
 # INPUT VIDEO
 INPUT_VID = r'...'
 
-# Names
-CLASSES = ['single_explosion', 'non_explosion']
-EXPLOSION = 'single_explosion'
-NON_EXPLOSION = 'non_explosion'
+# Names as they appear in your storage
+CLASSES = ['class_1', 'class_2']
+CLASS_1_NAME = 'class1'
+CLASS_2_NAME = 'class2'
 
 # Create samples
 DIM_LIMIT = 10
