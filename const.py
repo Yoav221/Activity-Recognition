@@ -14,14 +14,14 @@ NON_EXPLOSION_VIDEO_DATA = r'./Data/Video_data/class2'
 # Samples Data - the samples that have been splited from the whole video, and we run our model on those samples
 SAMPLE_VIDEO_PATH = '...'
 SAMPLE_FRAME_PATH = '...'
-
+SAMPLE_INDEX_DF = '...'
 # INPUT VIDEO
 INPUT_VID = r'...'
 
 # Names
 CLASSES = ['single_explosion', 'non_explosion']
-EXPLOSION = '...'
-NON_EXPLOSION = '...'
+EXPLOSION = 'single_explosion'
+NON_EXPLOSION = 'non_explosion'
 
 # Create samples
 DIM_LIMIT = 10
@@ -43,8 +43,8 @@ RNN_FC_dim = 36
 
 # Training params
 k = 2
-epochs = 10
-batch_size = 10
-learning_rate = 1e-4
-log_interval = 10
+EPOCHS = 10
+BATCH_SIZE = 10
+LEARNING_RATE = 1e-4
+LOG_INTERVAL = 10
 begin_frame, end_frame, skip_frame = 1, 11, 1

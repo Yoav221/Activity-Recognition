@@ -18,71 +18,85 @@ wether It's an explosion or not.
 The result will be saved in ./Final_Prediction_bomb_classifier.pkl'''
 
 
-def main():
+class Predict:
 
-    # If the samples don't exist create them, otherwise pass.
-    if not os.path.exists(SAMPLE_VIDEO_PATH) or (os.stat(SAMPLE_VIDEO_PATH).st_size == 0):
-        print("Creating Sample Videos ----->")
-        samples = Sample(main_video_path=INPUT_VID, explosion_name='single_explosion',
-                         non_explosion_name='non_explosion', sample_name=SAMPLE_NAME)
+    def __init__(self, sample_frames_path=SAMPLE_FRAME_PATH):
+        self.sample_frames_path = sample_frames_path
+        self.sample_name = SAMPLE_NAME
+        self.classes = CLASSES
+        self.index_df = pd.read_csv(SAMPLE_INDEX_DF, index_col=False)
 
-        frames_data, width_data, height_data = samples.create_samples(
-            FRAME_JUMP, WIDTH_JUMP, HEIGHT_JUMP, DIM_LIMIT)
-        print('Samples Videos have been created!')
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
+        self.params = {'batch_size': BATCH_SIZE, 'shuffle': True,
+                       'num_workers': 4, 'pin_memory': True} if torch.cuda.is_available() else {}
 
-    else:
-        print('Sample videos already exist!')
+        self.cnn_encoder = EncoderCNN()
+        self.rnn_decoder = DecoderRNN()
 
-    if not os.path.exists(SAMPLE_FRAME_PATH) or (os.stat(SAMPLE_FRAME_PATH).st_size == 0):
-        print("Creating Sample Frames ----->")
-        SaveFrames.save_frames_from_multiple_videos(
-            SAMPLE_NAME, SAMPLE_VIDEO_PATH, SAMPLE_FRAME_PATH)
-        print('Samples Frames have been created!')
+        self.data_loader, self.fnames, self.le = self.prepare_data()
 
-    else:
-        print('Sample frames already exist!')
+    @staticmethod
+    def CRNN_final_prediction(model, device, loader):
+        cnn_encoder, rnn_decoder = model
+        cnn_encoder.eval()
+        rnn_decoder.eval()
 
-    le, enc = convert2label_and_hot(CLASSES)
-    actions, all_X_list, fnames = create_X_list_and_actions(SAMPLE_FRAME_PATH)
-    all_y_list = labels2cat(le, actions)  # all video labels
+        all_y_pred = []
+        with torch.no_grad():
+            for batch_idx, (X, y) in enumerate(tqdm(loader)):
+                # distribute data to device
+                X = X.to(device)
+                output = rnn_decoder(cnn_encoder(X))
+                # location of max log-probability as prediction
+                y_pred = output.max(1, keepdim=True)[1]
+                all_y_pred.append(y_pred.cpu().data.squeeze().numpy().tolist())
 
-    # data loading parameters
-    use_cuda, device, params = data_loading_params(batch_size=batch_size)
+        return all_y_pred
 
-    transform = transforms.Compose([transforms.Resize([img_x, img_y]),
-                                    transforms.ToTensor(),
-                                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+    def prepare_data(self):
 
-    selected_frames = np.arange(begin_frame, end_frame, skip_frame).tolist()
+        le, enc = convert2label_and_hot(self.classes)
+        actions, all_X_list, fnames = create_X_list_and_actions(
+            self.sample_frames_path)
+        all_y_list = labels2cat(le, actions)  # all video labels
 
-    # reset data loader
-    all_data_loader = data.DataLoader(Dataset_CRNN(SAMPLE_FRAME_PATH, all_X_list, all_y_list, selected_frames, transform=transform),
-                                      **params)
+        transform = transforms.Compose([transforms.Resize([img_x, img_y]),
+                                        transforms.ToTensor(),
+                                        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-    # reload CRNN model
-    cnn_encoder = EncoderCNN()
-    rnn_decoder = DecoderRNN()
+        selected_frames = np.arange(
+            begin_frame, end_frame, skip_frame).tolist()
 
-    cnn_encoder.load_state_dict(torch.load(
-        os.path.join(save_model_path, 'cnn_encoder_epoch4.pth')))
-    rnn_decoder.load_state_dict(torch.load(
-        os.path.join(save_model_path, 'rnn_decoder_epoch4.pth')))
-    print('CRNN model reloaded!')
+        # reset data loader
+        data_loader = data.DataLoader(Dataset_CRNN(SAMPLE_FRAME_PATH, all_X_list, all_y_list, selected_frames, transform=transform),
+                                      **self.params)
 
-    # make all video predictions by reloaded model
-    print('Predicting all {} videos:'.format(len(all_data_loader.dataset)))
-    all_y_pred = CRNN_final_prediction(
-        [cnn_encoder, rnn_decoder], device, all_data_loader)
+        return data_loader, fnames, le
 
-    # write in pandas dataframe
-    df = pd.DataFrame(data={'filename': fnames, 'y_pred': cat2labels(
-        le, all_y_pred), 'frame_index': frames_data, 'width_index': width_data, 'hegith_index': height_data})
+    def predict(self):
 
-    # Show results - how many explosions
-    print(df['y_pred'].value_counts())
-    df.to_pickle("./Final_Prediction.pkl")  # save pandas dataframe
-    print('video prediction finished!')
+        self.cnn_encoder.load_state_dict(torch.load(
+            os.path.join(save_model_path, 'cnn_encoder_epoch4.pth')))
+        self.rnn_decoder.load_state_dict(torch.load(
+            os.path.join(save_model_path, 'rnn_decoder_epoch4.pth')))
+        print('CRNN model reloaded!')
+
+        all_y_pred = self.CRNN_final_prediction(
+            [self.cnn_encoder, self.rnn_decoder], self.device, self.data_loader)
+
+        # write in pandas dataframe
+        video_df = pd.DataFrame(data={'filename': self.fnames, 'y_pred': cat2labels(
+            self.le, all_y_pred)})
+
+        df = pd.concat([video_df, self.index_df], axis=1, join='inner')
+
+        # Show results - how many explosions
+        print(df['y_pred'].value_counts())
+        df.to_csv("./Final_Prediction.csv")  # save pandas dataframe
+        print('video prediction finished!')
 
 
 if __name__ == '__main__':
-    main()
+    p = Predict(SAMPLE_FRAME_PATH) # Predict on the sample frames
+    p.predict()

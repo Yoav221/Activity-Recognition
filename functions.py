@@ -10,11 +10,15 @@ from const import *
 from torch.utils import data
 
 # ------------- Some Useful Functions ----------------
+
+
 def labels2cat(label_encoder, list):
     return label_encoder.transform(list)
 
+
 def cat2labels(label_encoder, y_cat):
     return label_encoder.inverse_transform(y_cat).tolist()
+
 
 def rename_data(data, first_num_file, new_name):
     samples = []
@@ -91,85 +95,70 @@ def save_video_from_arr(vid_arr, path):
     out.release()
 
 
-class Sample:
-    def __init__(self, main_video_path, sample_video_path,
-                 explosion_name, non_explosion_name, sample_name):
+def create_samples(main_video_path=INPUT_VID, sample_video_path=SAMPLE_VIDEO_PATH,
+                   sample_name=SAMPLE_NAME, frame_jump=FRAME_JUMP, width_jump=WIDTH_JUMP,
+                   height_jump=HEIGHT_JUMP, dim_limit=DIM_LIMIT):
+    frames_data = []
+    width_data = []
+    height_data = []
 
-        self.main_video_path = main_video_path
-        self.sample_video_path = sample_video_path
+    video, frame_num, frame_height, frane_width = get_video_array(
+        main_video_path)
+    vid_num = 1
 
-        self.explosion_name = explosion_name
-        self.non_explosion_name = non_explosion_name
-        self.sample_name = sample_name
+    for frame_index in range(len(video) - dim_limit):
+        if frame_index % frame_jump == 0:
+            for width_index in range(len(video[0]) - dim_limit):
+                if width_index % width_jump == 0:
+                    for height_index in range(len(video[0][0]) - dim_limit):
+                        if height_index % height_jump == 0:
 
-    def create_samples(self, frame_count, width_count, height_count, dim_limit):
-        frames_data = []
-        width_data = []
-        height_data = []
+                            sample_video = video[frame_index:frame_index + 10, width_index: width_index + 10,
+                                                 height_index:height_index+10, :]
 
-        video, frame_num, frame_height, frane_width = get_video_array(
-            self.main_video_path)
-        vid_num = 1
+                            frames_data.append(frame_index)
+                            width_data.append(width_index)
+                            height_data.append(height_index)
 
-        for frame_index in range(len(video) - dim_limit):
-            if frame_index % frame_count == 0:
-                for width_index in range(len(video[0]) - dim_limit):
-                    if width_index % width_count == 0:
-                        for height_index in range(len(video[0][0]) - dim_limit):
-                            if height_index % height_count == 0:
+                            if not os.path.exists(sample_video_path):
+                                os.makedirs(sample_video_path)
 
-                                sample_video = video[frame_index:frame_index + 10, width_index: width_index + 10,
-                                                     height_index:height_index+10, :]
+                            if sample_video.shape == (10, 10, 10, 3):
+                                path = f'{sample_video_path}/{sample_name}{vid_num}.avi'
+                                save_video_from_arr(sample_video, path)
+                                vid_num += 1
 
-                                frames_data.append(frame_index)
-                                width_data.append(width_index)
-                                height_data.append(height_index)
-
-                                if not os.path.exists(self.sample_video_path):
-                                    os.makedirs(self.sample_video_path)
-
-                                if sample_video.shape == (10, 10, 10, 3):
-                                    path = f'{self.sample_video_path}/{self.sample_name}{vid_num}.avi'
-                                    save_video_from_arr(sample_video, path)
-                                    vid_num += 1
-
-        return frames_data, width_data, height_data
+    return frames_data, width_data, height_data
 
 
-class SaveFrames:
-    def __init__(self, video_path, frames_path, video_name):
-        self.video_path = video_path
-        self.frames_path = frames_path
-        self.video_name = video_name
-
-    def save_frames_from_video_to_storage(self):
-        cap = cv2.VideoCapture(self.video_path)
-        i = 0
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if ret == True:
-                i += 1
-                img_number = str(i).zfill(5)
-                frame_file_name = f'{self.frames_path}//image{img_number}.png'
-                gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                cv2.imwrite(frame_file_name, gray_frame)
-            else:
-                break
-
-    def save_frames_from_multiple_videos(self):
-        if not os.path.exists(self.frames_path):
-            os.makedirs(self.frames_path)
-        for i in range(len(os.listdir(self.video_path))):
+def save_frames_from_video_to_storage(video_path, frames_path):
+    cap = cv2.VideoCapture(video_path)
+    i = 0
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if ret == True:
             i += 1
-            if not os.path.exists(f'{self.frames_path}/{self.video_name}{i}'):
-                os.makedirs(f'{self.frames_path}/{self.video_name}{i}')
-            video_file = f'{self.video_path}/{self.video_name}{i}.avi'
-            self.save_frames_from_video_to_storage(
-                video_file, (f'{self.frames_path}/{self.video_name}{i}'))
+            img_number = str(i).zfill(5)
+            frame_file_name = f'{frames_path}//image{img_number}.png'
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            cv2.imwrite(frame_file_name, gray_frame)
+        else:
+            break
+
+
+def save_frames_from_multiple_videos(video_name, video_path, frame_path):
+    if not os.path.exists(frame_path):
+        os.makedirs(frame_path)
+    for i in range(len(os.listdir(video_path))):
+        i += 1
+        if not os.path.exists(f'{frame_path}/{video_name}{i}'):
+            os.makedirs(f'{frame_path}/{video_name}{i}')
+        video_file = f'{video_path}/{video_name}{i}.avi'
+        save_frames_from_video_to_storage(
+            video_file, (f'{frame_path}/{video_name}{i}'))
+
 
 # --------------- Train & Validation functions --------------------
-
-
 def train(log_interval, model, device, train_loader, optimizer, epoch):
     # Set model as training mode
     cnn_encoder, rnn_decoder = model
@@ -258,19 +247,3 @@ def validation(model, device, optimizer, test_loader, epoch):
 
 
 # --------------- Make Prediction ---------------------
-def CRNN_final_prediction(model, device, loader):
-    cnn_encoder, rnn_decoder = model
-    cnn_encoder.eval()
-    rnn_decoder.eval()
-
-    all_y_pred = []
-    with torch.no_grad():
-        for batch_idx, (X, y) in enumerate(tqdm(loader)):
-            # distribute data to device
-            X = X.to(device)
-            output = rnn_decoder(cnn_encoder(X))
-            # location of max log-probability as prediction
-            y_pred = output.max(1, keepdim=True)[1]
-            all_y_pred.append(y_pred.cpu().data.squeeze().numpy().tolist())
-
-    return all_y_pred
