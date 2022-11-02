@@ -37,4 +37,4 @@ Set the pathes this way:
   
   
 - In 'models.py' we create the cnn+rnn architecture and create our custom Dataset class.
-- In 'functions.py' we have useful functions that we'll use through the code.
+- In 'functions.py' we have useful functions that we'll use throughout the code.
