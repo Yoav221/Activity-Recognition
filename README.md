@@ -29,12 +29,12 @@ Set the pathes this way:
 - Adjust the pathes and parameters in 'const.py'
 - Run 'data_preprocessing.py' to make the Data ready for training
 - Run 'train.py' to train the model.
-- 
 - Choose an Input Video, and run 'create_samples.py' to create the samples from the video.
 - Run 'predict' to predict each sample.
 - Run plot_prediction.py to see 3D map for all the activities (class1) our model found in the video.
 - Run draw_rectangle.py to draw a rectangle around every activity in the video.
                                 
-                                
+  
+  
 - In 'models.py' we create the cnn+rnn architecture and create our custom Dataset class.
 - In 'functions.py' we have useful functions that we'll use through the code.
