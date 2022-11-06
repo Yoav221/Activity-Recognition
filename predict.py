@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from torch.utils import data
 from models import *
 
+
 class Predict:
 
     def __init__(self, sample_frames_path=SAMPLE_FRAME_PATH):
@@ -89,9 +90,10 @@ class Predict:
 
         # Show results - how many class 1 activities
         print('Result: ' + str(all_data['y_pred'].value_counts()))
+
+        # Save dataframes to csv
         all_data.to_csv("././Final_Prediction.csv")
         only_class1_data.to_csv("./Final_Prediction_of_class1.csv")
-        print('video prediction finished!')
 
 
 if __name__ == '__main__':
