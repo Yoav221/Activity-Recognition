@@ -32,6 +32,7 @@ HEIGHT_JUMP = 10
 SAMPLE_NAME = 'sample_'
 
 # EndcoderCNN hyperparams
+CNN_OUTPUT = 6
 CNN_embed_dim = 48
 img_x, img_y = 10, 10
 dropout_p = 0.2

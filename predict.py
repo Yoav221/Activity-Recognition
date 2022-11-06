@@ -12,11 +12,6 @@ import matplotlib.pyplot as plt
 from torch.utils import data
 from models import *
 
-'''In this code we create samples video from the video, 
-and the model will run on all of them and make a prediction, wether it's class 1 or 2.
-The result will be saved in ./Final_Prediction.csv'''
-
-
 class Predict:
 
     def __init__(self, sample_frames_path=SAMPLE_FRAME_PATH):

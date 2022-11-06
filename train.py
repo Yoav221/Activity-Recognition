@@ -28,9 +28,9 @@ class Trainer:
         self.cnn_encoder = EncoderCNN()
         self.rnn_decoder = DecoderRNN()
 
-        crnn_params = list(self.cnn_encoder.parameters()) + list(self.rnn_decoder.parameters())
+        crnn_params = list(self.cnn_encoder.parameters()) + \
+            list(self.rnn_decoder.parameters())
         self.optimizer = torch.optim.Adam(crnn_params, lr=self.LEARNING_RATE)
-
 
     def prepare_data(self):
 
@@ -59,12 +59,13 @@ class Trainer:
                                         transforms.ToTensor(),
                                         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
-        selected_frames = np.arange(begin_frame, end_frame, skip_frame).tolist()
+        selected_frames = np.arange(
+            begin_frame, end_frame, skip_frame).tolist()
 
-        train_set, valid_set = Dataset_CRNN(self.train_data_path, train_list, train_label, 
+        train_set, valid_set = Dataset_CRNN(self.train_data_path, train_list, train_label,
                                             selected_frames, transform=transform), \
-                               Dataset_CRNN(self.train_data_path, test_list, test_label,
-                                            selected_frames, transform=transform)
+            Dataset_CRNN(self.train_data_path, test_list, test_label,
+                         selected_frames, transform=transform)
 
         train_loader = data.DataLoader(
             train_set, **self.params, batch_size=self.batch_size)
@@ -90,8 +91,8 @@ class Trainer:
             train_losses, train_scores = train(self.log_interval, [self.cnn_encoder, self.rnn_decoder],
                                                self.device, self.train_loader, self.optimizer, epoch)
 
-            epoch_test_loss, epoch_test_score = validation([self.cnn_encoder, self.rnn_decoder], 
-                                                            self.device, self.optimizer, self.valid_loader, epoch)
+            epoch_test_loss, epoch_test_score = validation([self.cnn_encoder, self.rnn_decoder],
+                                                           self.device, self.optimizer, self.valid_loader, epoch)
 
             # save results
             epoch_train_losses.append(train_losses)

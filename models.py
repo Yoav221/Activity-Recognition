@@ -13,10 +13,10 @@ from torch.utils import data
 
 
 class EncoderCNN(nn.Module):
-    def __init__(self):
+    def __init__(self, img_x=img_x, img_y=img_y, cnn_out=CNN_OUTPUT, cnn_embed=CNN_embed_dim):
         super().__init__()
-        self.conv = nn.Conv2d(1, 6, 3, 1)
-        self.fc = nn.Linear(6 * 8 * 8, 48)
+        self.conv = nn.Conv2d(1, cnn_out, 3, 1)
+        self.fc = nn.Linear(cnn_out * (img_x-2) * (img_y-2), cnn_embed)
 
     def forward(self, x_3d):
         cnn_embed_seq = []
