@@ -10,6 +10,106 @@ from const import *
 from torch.utils import data
 
 # ------------- Prepare the data ----------------
+
+
+class FrameData:
+
+    def __init__(self, video_path, frame_path, video_name):
+        self.video_path = video_path
+        self.frame_path = frame_path
+        self.video_name = video_name
+
+    def save_frames_from_video_to_storage(self, video_path, frames_path):
+        cap = cv2.VideoCapture(video_path)
+        i = 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if ret == True:
+                i += 1
+                img_number = str(i).zfill(5)
+                frame_file_name = f'{frames_path}//image{img_number}.png'
+                gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                cv2.imwrite(frame_file_name, gray_frame)
+            else:
+                break
+
+    def save_frames_from_multiple_videos(self):
+        if not os.path.exists(self.frame_path):
+            os.makedirs(self.frame_path)
+        for i in range(len(os.listdir(self.video_path))):
+            i += 1
+            video_path = f'{self.video_path}/{self.sample_name}{i}.avi'
+            frame_path = f'{self.frame_path}/{self.sample_name}{i}'
+            if not os.path.exists(frame_path):
+                os.makedirs(frame_path)
+            self.save_frames_from_video_to_storage(
+                video_path=video_path, frames_path=frame_path)
+
+
+class SampleData(FrameData):
+
+    def __init__(self, main_video_path=INPUT_VID, video_path=SAMPLE_VIDEO_PATH, frame_path=SAMPLE_FRAME_PATH, sample_name=SAMPLE_NAME):
+        super().__init__(video_path, frame_path, sample_name)
+        self.sample_name = sample_name
+        self.main_video_path = main_video_path
+        self.frames_data, self.width_data, self.height_data, self.df_type = None, None, None, None
+
+    def create_samples(self, frame_jump=FRAME_JUMP, width_jump=WIDTH_JUMP,
+                       height_jump=HEIGHT_JUMP, dim_limit=DIM_LIMIT):
+        frames_data = []
+        width_data = []
+        height_data = []
+
+        video, frame_num, frame_height, frane_width = get_video_array(
+            self.main_video_path)
+        vid_num = 1
+
+        for frame_index in range(len(video) - dim_limit):
+            if frame_index % frame_jump == 0:
+                for width_index in range(len(video[0]) - dim_limit):
+                    if width_index % width_jump == 0:
+                        for height_index in range(len(video[0][0]) - dim_limit):
+                            if height_index % height_jump == 0:
+
+                                sample_video = video[frame_index:frame_index + 10, width_index: width_index + 10,
+                                                     height_index:height_index+10, :]
+
+                                frames_data.append(frame_index)
+                                width_data.append(width_index)
+                                height_data.append(height_index)
+
+                                if not os.path.exists(self.video_path):
+                                    os.makedirs(self.video_path)
+
+                                if sample_video.shape == (10, 10, 10, 3):
+                                    path = f'{self.video_path}/{self.sample_name}{vid_num}.avi'
+                                    save_video_from_arr(sample_video, path)
+                                    vid_num += 1
+
+        return frames_data, width_data, height_data
+
+    def create_if_not_exist(self, frame_jump=FRAME_JUMP, width_jump=WIDTH_JUMP, height_jump=HEIGHT_JUMP, dim_limit=DIM_LIMIT):
+
+        if not os.path.exists(self.video_path) or (os.stat(self.video_path).st_size == 0):
+            print("Creating Sample Videos ----->")
+            self.frames_data, self.width_data, self.height_data = self.create_samples(
+                frame_jump=frame_jump, width_jump=width_jump, height_jump=height_jump, dim_limit=dim_limit)
+            print('Samples Videos have been created!')
+            self.df_type = 1
+        else:
+            print('Sample videos already exist!')
+
+        if not os.path.exists(self.frame_path) or (os.stat(self.frame_path).st_size == 0):
+            print("Creating Sample Frames ----->")
+            self.save_frames_from_multiple_videos()
+            print('Samples Frames have been created!')
+        else:
+            print('Sample frames already exist!')
+            self.df_type = 0
+
+        return self.frames_data, self.width_data, self.height_data, self.df_type
+
+
 def labels2cat(label_encoder, list):
     return label_encoder.transform(list)
 
@@ -90,69 +190,6 @@ def save_video_from_arr(vid_arr, path):
         data = vid_arr[i, :, :, :]
         out.write(data)
     out.release()
-
-
-def create_samples(main_video_path=INPUT_VID, sample_video_path=SAMPLE_VIDEO_PATH,
-                   sample_name=SAMPLE_NAME, frame_jump=FRAME_JUMP, width_jump=WIDTH_JUMP,
-                   height_jump=HEIGHT_JUMP, dim_limit=DIM_LIMIT):
-    frames_data = []
-    width_data = []
-    height_data = []
-
-    video, frame_num, frame_height, frane_width = get_video_array(
-        main_video_path)
-    vid_num = 1
-
-    for frame_index in range(len(video) - dim_limit):
-        if frame_index % frame_jump == 0:
-            for width_index in range(len(video[0]) - dim_limit):
-                if width_index % width_jump == 0:
-                    for height_index in range(len(video[0][0]) - dim_limit):
-                        if height_index % height_jump == 0:
-
-                            sample_video = video[frame_index:frame_index + 10, width_index: width_index + 10,
-                                                 height_index:height_index+10, :]
-
-                            frames_data.append(frame_index)
-                            width_data.append(width_index)
-                            height_data.append(height_index)
-
-                            if not os.path.exists(sample_video_path):
-                                os.makedirs(sample_video_path)
-
-                            if sample_video.shape == (10, 10, 10, 3):
-                                path = f'{sample_video_path}/{sample_name}{vid_num}.avi'
-                                save_video_from_arr(sample_video, path)
-                                vid_num += 1
-
-    return frames_data, width_data, height_data
-
-
-def save_frames_from_video_to_storage(video_path, frames_path):
-    cap = cv2.VideoCapture(video_path)
-    i = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if ret == True:
-            i += 1
-            img_number = str(i).zfill(5)
-            frame_file_name = f'{frames_path}//image{img_number}.png'
-            # gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # This is optinal if you don't need color, it saves computation cost.
-            cv2.imwrite(frame_file_name, frame_file_name)
-        else:
-            break
-
-
-def save_frames_from_multiple_videos(video_name, video_path, frame_path):
-    if not os.path.exists(frame_path):
-        os.makedirs(frame_path)
-    for i in range(len(os.listdir(video_path))):
-        i += 1
-        if not os.path.exists(f'{frame_path}/{video_name}{i}'):
-            os.makedirs(f'{frame_path}/{video_name}{i}')
-        video_file = f'{video_path}/{video_name}{i}.avi'
-        save_frames_from_video_to_storage(
-            video_file, (f'{frame_path}/{video_name}{i}'))
 
 
 # --------------- Train & Validation --------------------
@@ -241,6 +278,3 @@ def validation(model, device, optimizer, test_loader, epoch):
     print("Epoch {} model saved!".format(epoch + 1))
 
     return test_loss, test_score
-
-
-# --------------- Make Prediction ---------------------
