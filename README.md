@@ -9,7 +9,7 @@ We use CNN + RNN archcitecture, the CNN extract features from the video's frames
 Here we try to recognize an activity of size 10x10 that happens in a 10 frames window.
 You can change it to your need in the const.py module and adjust the Network's parameters.
 
-In order to detect the activity in a given video, we need to split the whole video to small samples, and the model will make a prediction on each sample. This way we get the location (coordinates of - frame, width and height) of the activity in the video (e.g - frame 15, width 50, and height 100). 
+In order to detect the activity in a given video, we need to split the whole video to small samples, and the model will make a prediction on each sample. This way we get the location (coordinates of - frame, width and height) of the activity in the video (I.e. - [frame, width, height]). 
 
 
 Instructions:
